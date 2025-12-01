@@ -15,16 +15,35 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('avatar')->nullable();
+            $table->text('bio')->nullable();
+            $table->string('location')->nullable();
+            $table->string('website')->nullable();
+            $table->enum('role', ['user', 'admin'])->default('user');
+            $table->timestamp('email_verified_at')->nullable();
+            // Thống kê (tăng tốc cực mạnh)
+            $table->unsignedBigInteger('posts_count')->default(0);
+            $table->unsignedBigInteger('followers_count')->default(0);
+            $table->unsignedBigInteger('following_count')->default(0);
+            // Trạng thái tài khoản
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_private')->default(false);     // tài khoản riêng tư
+            // Remember token chuẩn Laravel
             $table->rememberToken();
             $table->timestamps();
+            // Index vàng
+            $table->index('role');
+            $table->index('created_at');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
+
+            // Tự động xóa token cũ sau 1 giờ (tùy chọn)
+            $table->index('email');
         });
 
         Schema::create('sessions', function (Blueprint $table) {
