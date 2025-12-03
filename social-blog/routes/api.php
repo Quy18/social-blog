@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RegisterController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', RegisterController::class); // __invoke nên dùng trực tiếp
@@ -10,5 +11,6 @@ Route::post('/refresh', [AuthController::class, 'refresh']); // KHÔNG CẦN MID
 
 Route::middleware('jwt.auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me', [AuthController::class, 'me']);
+    Route::get('/me', [UserController::class, 'me']);
+    Route::put('/update', [UserController::class, 'update']);
 });

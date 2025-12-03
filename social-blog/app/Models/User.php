@@ -18,6 +18,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var list<string>
      */
+    protected $guarded = []; // ← cho phép fill tất cả field
     protected $fillable = [
         'name',
         'email',

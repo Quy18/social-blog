@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AuthRequest;
+use App\Http\Requests\Auth\AuthRequest;
 use App\Services\AuthService;
-use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
@@ -24,7 +23,7 @@ class AuthController extends Controller
     }
 
     // Logout
-    public function logout(AuthService $service){
+    public function logout(){
         $this->service->logout();
 
         return response()->json([
@@ -40,13 +39,5 @@ class AuthController extends Controller
         );
     }
 
-    // Me
-    public function me()
-    {
-        $user = $this->service->me();
-
-        return $user
-            ? response()->json($user)
-            : response()->json(['error' => 'Unauthorized'], 401);
-    }
+    
 }

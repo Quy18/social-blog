@@ -68,15 +68,4 @@ class AuthService {
             ]);
         }
     }
-
-    // Bonus: Hàm me() để lấy user hiện tại
-    public function me(): ?User
-    {
-        try {
-            // Trả về User
-            return JWTAuth::parseToken()->authenticate();
-        } catch (JWTException $e) {
-            return null;
-        }
-    }
 }
