@@ -144,6 +144,7 @@ return [
     |
     */
 
+    
     'required_claims' => [
         'iss',
         'iat',
@@ -167,6 +168,9 @@ return [
     */
 
     'persistent_claims' => [
+        'email',
+        'name',
+        'role',
         // 'foo',
         // 'bar',
     ],
@@ -205,7 +209,7 @@ return [
     |
     */
 
-    'leeway' => env('JWT_LEEWAY', 0),
+    'leeway' => (int) env('JWT_LEEWAY', 60),
 
     /*
     |--------------------------------------------------------------------------

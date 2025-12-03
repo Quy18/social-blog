@@ -13,7 +13,14 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',                           // TỰ ĐỘNG THÊM /api
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        
+        // ĐĂNG KÝ ALIAS CHO JWT (bắt buộc Laravel 11)
+        $middleware->alias([
+            'jwt.auth'    => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
+            'jwt.refresh' => \Tymon\JWTAuth\Http\Middleware\RefreshToken::class,
+        ]);
+
+        // TẮT HOÀN TOÀN SANCTUM (nếu không dùng)
+        $middleware->api(prepend: []);           // giết chết EnsureFrontendRequestsAreStateful
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

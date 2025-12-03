@@ -14,7 +14,7 @@ class RegisterController extends Controller
     {
         $user = $service->register($request->validated());
 
-        // Tự động đăng nhập sau khi đăng ký
+        // Tạo luôn token cho fe để thực hiện login luôn
         $token = JWTAuth::fromUser($user);
 
         return response()->json([

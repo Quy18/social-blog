@@ -29,7 +29,7 @@ class AuthService {
         $expiresInSeconds = $ttlMinutes * 60;
 
         return [
-            'user' => $user->makeVisible(['email']),
+            'user' => $user,
             'token' => $token,
             'expires_in' => $expiresInSeconds, // mặc định 1  giờ 
         ];
@@ -37,8 +37,11 @@ class AuthService {
 
     public function logout(): void
     {
+        // try/catch để tránh lỗi token hết hạn
+        // phải bật blacklist_enabled => true trong config/jwt.php
         try {
-            JWTAuth::invalidate(JWTAuth::getToken()); // blacklist token hiện tại
+            // JWTAuth::getToken() → lấy token từ Authorization header
+            JWTAuth::parseToken()->invalidate(); // blacklist token hiện tại
         } catch (JWTException $e) {
             // nếu token đã hết hạn hoặc không có thì cũng coi như logout thành công
         }
@@ -47,21 +50,21 @@ class AuthService {
     public function refresh(): array
     {
         try {
-            // Dùng Facade để refresh – tự động dùng JWT_REFRESH_TTL nếu token expired
-            $newToken = JWTAuth::refresh(JWTAuth::getToken());
+            // Dùng parseToken() để tự động lấy từ header/cookie
+            $newToken = JWTAuth::parseToken()->refresh();
 
             // Lấy TTL đúng (dùng config JWT_REFRESH_TTL nếu có, fallback JWT_TTL)
-            $refreshTtlMinutes = config('jwt.refresh_ttl', config('jwt.ttl', 60));
-            $expiresInSeconds = $refreshTtlMinutes * 60;
+            // $refreshTtlMinutes = config('jwt.refresh_ttl', config('jwt.ttl', 60));
+            // $expiresInSeconds = $refreshTtlMinutes * 60;
 
             return [
-                'token'      => $newToken,
-                'expires_in' => $expiresInSeconds,
+                'access_token' => $newToken,
+                'token_type'   => 'bearer',
+                'expires_in'   => config('jwt.ttl') * 60, // access token mới có TTL mới
             ];
         } catch (JWTException $e) {
-            // Nếu token không refresh được (hết hạn refresh hoặc invalid)
             throw ValidationException::withMessages([
-                'token' => ['Token không thể refresh. Vui lòng đăng nhập lại.'],
+                'token' => ['Token đã hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại.'],
             ]);
         }
     }
@@ -70,6 +73,7 @@ class AuthService {
     public function me(): ?User
     {
         try {
+            // Trả về User
             return JWTAuth::parseToken()->authenticate();
         } catch (JWTException $e) {
             return null;
