@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Gd\Driver;
 
 class UserService {
     // Đăng ký người dùng mới
@@ -49,5 +47,24 @@ class UserService {
         $user->save();
 
         return $user->fresh();
+    }
+
+    public function updateAvatar(User $user, array $data)
+    {
+        if (isset($data['avatar']) && $data['avatar'] instanceof \Illuminate\Http\UploadedFile) {
+            // Xóa avatar cũ nếu có
+            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+
+            // Lưu file mới
+            $path = $data['avatar']->store('avatars', 'public');
+
+            // Cập nhật user
+            $user->avatar = $path;
+            $user->save();
+        }
+
+        return $path;
     }
 }

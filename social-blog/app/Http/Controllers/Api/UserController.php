@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\UpdateAvatarRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Services\UserService;
 use Illuminate\Http\Request;
@@ -33,6 +34,16 @@ class UserController extends Controller
         return response()->json([
             'message' => 'Cập nhật thành công!',
             'user' => $updatedUser,
+        ]);
+    }
+
+    // Update avatar
+    public function updateAvatar(UpdateAvatarRequest $request){
+        $updateAvatar = $this->service->updateAvatar(auth('api')->user(), $request->validated());
+
+        return response()->json([
+            'message' => 'Cập nhật thành công.',
+            'path'  => $updateAvatar,
         ]);
     }
 }

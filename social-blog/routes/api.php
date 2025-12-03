@@ -13,4 +13,6 @@ Route::middleware('jwt.auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [UserController::class, 'me']);
     Route::put('/update', [UserController::class, 'update']);
+    Route::post('/update/avatar', [UserController::class, 'updateAvatar']);
+
 });
