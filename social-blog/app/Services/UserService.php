@@ -1,10 +1,13 @@
 <?php
 namespace App\Services;
 
+use App\Jobs\SendVerifyEmailJob;
+use App\Models\EmailVerification;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -26,6 +29,19 @@ class UserService {
             'password' => Hash::make($data['password']),
             'is_active' => true,
         ]);
+
+        // Tạo token để verify mail
+        $tokenMail = Str::random(64);
+
+        // Lưu vào bảng
+        EmailVerification::create([
+            'user_id' => $user->id,
+            'token'   => $tokenMail,
+            'expires_at' => now()->addHours(24),
+        ]);
+
+        // Gửi mail
+        SendVerifyEmailJob::dispatch($user, $tokenMail);
 
         return $user;
     }
