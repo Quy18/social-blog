@@ -15,4 +15,5 @@ Route::middleware('jwt.auth')->group(function () {
     Route::get('/me', [UserController::class, 'me']);
     Route::put('/update', [UserController::class, 'update']);
     Route::post('/update/avatar', [UserController::class, 'updateAvatar']);
+    Route::get('/verify-email/resend', [UserController::class, 'resendVerifyEmail']);
 });

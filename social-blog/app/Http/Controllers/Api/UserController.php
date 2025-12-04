@@ -59,7 +59,7 @@ class UserController extends Controller
             return response()->json(['message' => 'Invalid token'], 400);
         }
 
-        // Kiểm tra token quá 24h chưa
+        // Kiểm tra token quá 5p chưa
         if ($verify->expires_at->isPast()) {
             return response()->json(['message' => 'Token expired'], 400);
         }
@@ -77,6 +77,15 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'Email verified successfully.',
+        ]);
+    }
+
+    // Gửi lại email xác nhận
+    public function resendVerifyEmail(){
+        $resend = $this->service->resendEmailVerifyService();
+
+        return response()->json([
+            $resend,
         ]);
     }
 }

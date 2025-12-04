@@ -37,13 +37,54 @@ class UserService {
         EmailVerification::create([
             'user_id' => $user->id,
             'token'   => $tokenMail,
-            'expires_at' => now()->addHours(24),
+            // tạo thời gian tối đa có thể sử dụng token để verify
+            'expires_at' => now()->addMinutes(5),
         ]);
 
-        // Gửi mail
+        // Gửi mail bằng job
         SendVerifyEmailJob::dispatch($user, $tokenMail);
 
         return $user;
+    }
+
+    // Gửi lại email verify
+    public function resendEmailVerifyService(){
+        $user = auth('api')->user();
+
+        $verify = EmailVerification::where('user_id', $user->id)->first();
+
+        if(!$verify){
+            throw ValidationException::withMessages([
+                'message' => ['Tài khoản không tồn tại hoặc đã xác minh email.'],
+            ]);
+        }
+
+        if(!$verify->expires_at->isPast()){
+            $remaining = $verify->expires_at->diffInSeconds(now());
+
+            throw ValidationException::withMessages([
+                'message' => ["Vui lòng chờ $remaining giây để gửi lại email."],
+            ]);
+        }
+
+        // Xóa tokenMail cũ đã hết hạn
+        $verify->delete();
+
+        // Tạo token verify mới
+        $tokenMail = Str::random(64);
+
+        // tạo mới email verify
+        EmailVerification::create([
+            'user_id' => $user->id,
+            'token'   => $tokenMail,
+            // tạo thời gian tối đa có thể sử dụng token để verify
+            'expires_at' => now()->addMinutes(5),
+        ]);
+
+        // Gửi mail bằng job
+        SendVerifyEmailJob::dispatch($user, $tokenMail);
+
+        return ['message' => 'Email xác minh đã được gửi lại!'];
     }
 
     // Thông tin người dùng
