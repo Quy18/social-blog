@@ -47,6 +47,35 @@ class UserService {
         return $user;
     }
 
+    // Verify Email
+    public function verifyEmail(string $token){
+        // Tìm token trong database
+        $verify = EmailVerification::where('token', $token)->first();
+
+        if(!$verify){
+            return response()->json(['message' => 'Invalid token'], 400);
+        }
+
+        // Kiểm tra token quá 5p chưa
+        if ($verify->expires_at->isPast()) {
+            return response()->json(['message' => 'Token expired'], 400);
+        }
+
+        // Lấy user
+        $user = $verify->user;
+
+        // Update trạng thái verify
+        $user->update([
+            'email_verified_at' => now(),
+        ]);
+
+        //Xóa tokenMail để tránh dùng lại
+        $verify->delete();
+
+        return ['message' => 'Email verified successfully.'];
+    }
+
+
     // Gửi lại email verify
     public function resendEmailVerifyService(){
         $user = auth('api')->user();

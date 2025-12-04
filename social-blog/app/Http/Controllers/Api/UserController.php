@@ -52,31 +52,10 @@ class UserController extends Controller
     public function verifyEmail(Request $request){
         $tokenEmail = $request->token;
 
-        // Tìm token trong database
-        $verify = EmailVerification::where('token', $tokenEmail)->first();
-
-        if(!$verify){
-            return response()->json(['message' => 'Invalid token'], 400);
-        }
-
-        // Kiểm tra token quá 5p chưa
-        if ($verify->expires_at->isPast()) {
-            return response()->json(['message' => 'Token expired'], 400);
-        }
-
-        // Lấy user
-        $user = $verify->user;
-
-        // Update trạng thái verify
-        $user->update([
-            'email_verified_at' => now(),
-        ]);
-
-        //Xóa tokenMail để tránh dùng lại
-        $verify->delete();
+        $verify = $this->service->verifyEmail($tokenEmail);
 
         return response()->json([
-            'message' => 'Email verified successfully.',
+            $verify,
         ]);
     }
 
@@ -88,4 +67,8 @@ class UserController extends Controller
             $resend,
         ]);
     }
+
+    // Change passwork
+    
+
 }
