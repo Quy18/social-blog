@@ -153,4 +153,29 @@ class UserService {
 
         return $path;
     }
+
+
+    // Change password
+    public function changePassService(array $data){
+        $user = auth('api')->user();
+
+        if(!$user){
+            throw ValidationException::withMessages([
+                'message' => 'Vui lòng đăng nhập vào tài khoản trước.',
+            ]);
+        }
+
+        if(!Hash::check($data['password_old'], $user->password)){
+            throw ValidationException::withMessages([
+                'message' => 'Mật khẩu cũ không khớp.',
+            ]);
+        }
+
+        $user->password = Hash::make($data['password_new']);
+        $user->save();
+
+        JWTAuth::parseToken()->invalidate(); // blacklist token hiện tại
+
+        return ['message' => 'Đổi mật khẩu mới thành công.'];
+    }
 }

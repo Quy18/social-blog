@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\ChangePassRequest;
 use App\Http\Requests\User\UpdateAvatarRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\EmailVerification;
@@ -69,6 +70,12 @@ class UserController extends Controller
     }
 
     // Change passwork
-    
+    public function changePass(ChangePassRequest $request){
+        $changePass = $this->service->changePassService($request->validated());
+
+        return response()->json([
+            $changePass,
+        ]);
+    }
 
 }
