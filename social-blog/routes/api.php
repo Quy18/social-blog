@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
@@ -17,4 +18,6 @@ Route::middleware('jwt.auth')->group(function () {
     Route::post('/update/avatar', [UserController::class, 'updateAvatar']);
     Route::get('/verify-email/resend', [UserController::class, 'resendVerifyEmail']);
     Route::post('/change-pass', [UserController::class, 'changePass']);
+
+    Route::post('/post/create', [PostController::class, 'CreatePost']);
 });
