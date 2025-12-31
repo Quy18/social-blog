@@ -21,4 +21,10 @@ class PostController extends Controller
             $this->service->createPost($request->validated()),
         );
     }
+
+    public function GetPost($id){
+        return response()->json([
+            $this->service->getPost($id),
+        ]);
+    }
 }

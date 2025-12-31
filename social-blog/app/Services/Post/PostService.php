@@ -7,6 +7,8 @@ use App\Models\Post;
 use Exception;
 use Illuminate\Support\Str;
 
+use function PHPUnit\Framework\isEmpty;
+
 class PostService implements IPostService{
     public function createPost(array $data)
     {
@@ -28,6 +30,7 @@ class PostService implements IPostService{
             'title' => $data['title'],
             'slug' => $slug,
             'content' => $data['content'],
+            'status' => $data['status'],
             'published_at' => $data['published_at'],
             'featured_image' => $data['featured_image'],
         ]);
@@ -37,13 +40,22 @@ class PostService implements IPostService{
         ];
     }
 
-    public function getPost()
+    public function getPost($id)
     {
         $user = auth('api')->user();
         if(!$user){
-            throw new Exception('Unauthenticated');
+            return [
+                'message' => 'Unauthenticated'
+            ];
         }
-        
+        $arrPost = Post::where('user_id', $id)
+            ->where('status', 'published')
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
+        return [
+            'message' => 'Lấy toàn bộ bài đăng thành công.',
+            'data' => $arrPost,
+        ];
     }
 
     public function deletePost()

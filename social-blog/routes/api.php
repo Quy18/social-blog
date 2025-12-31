@@ -19,5 +19,9 @@ Route::middleware('jwt.auth')->group(function () {
     Route::get('/verify-email/resend', [UserController::class, 'resendVerifyEmail']);
     Route::post('/change-pass', [UserController::class, 'changePass']);
 
-    Route::post('/post/create', [PostController::class, 'CreatePost']);
+    Route::prefix('post')->group(function(){
+        Route::post('/create', [PostController::class, 'CreatePost']);
+        Route::get('/get-post/{id}', [PostController::class, 'GetPost']);
+    });
+    
 });
