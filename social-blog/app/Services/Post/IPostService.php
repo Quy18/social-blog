@@ -8,5 +8,5 @@ interface IPostService{
     public function createPost(array $data);
     public function getPost($id);
     public function deletePost();
-    public function updatePost();
+    public function updatePost(array $data);
 }

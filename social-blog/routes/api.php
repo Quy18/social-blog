@@ -22,6 +22,7 @@ Route::middleware('jwt.auth')->group(function () {
     Route::prefix('post')->group(function(){
         Route::post('/create', [PostController::class, 'CreatePost']);
         Route::get('/get-post/{id}', [PostController::class, 'GetPost']);
+        Route::put('/update', [PostController::class, 'UpdatePost']);
     });
     
 });

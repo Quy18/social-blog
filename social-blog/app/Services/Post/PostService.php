@@ -63,8 +63,41 @@ class PostService implements IPostService{
         throw new \Exception('Not implemented');
     }
 
-    public function updatePost()
+    public function updatePost(array $data)
     {
-        throw new \Exception('Not implemented');
+        $user = auth('api')->user();
+        if(!$user){
+            return [
+                'message' => 'Unauthenticated'
+            ];
+        }
+
+        $post = Post::where('slug', $data['slug_old'])->first();
+
+        if(!$post){
+            return [
+                'message' => 'Khong tim thay bai post.',
+            ];
+        }
+        
+        $slug = Str::slug($data['title']);
+        $count = Post::where('slug', 'like', "$slug%")->count();
+
+        if($count >= 0){
+            $slug .= '-' . ($count + 1);
+        }
+
+        $post->update([
+            'title' => $data['title'],
+            'slug' => $slug,
+            'content' => $data['content'],
+            'status' => $data['status'],
+            'published_at' => $data['published_at'],
+            'featured_image' => $data['featured_image'],
+        ]);
+
+        return [
+            'message' => 'Updated successfully.',
+        ];
     }
 }
